@@ -1,6 +1,6 @@
 #!/bin/python
 
-import sys
+import sys, os
 
 if len(sys.argv) <= 1:
 	print("Usage: python %s 6_1194")
@@ -16,7 +16,10 @@ def doublyLink(m):
 	keys = list(m.keys())
 	vals = list(m.values())
 	for x in range(len(keys)):
-		m[vals[x]] = keys[x]
+		if type(vals[x]) is tuple:
+			m[vals[x][0]] = keys[x]
+		else:
+			m[vals[x]] = keys[x]
 
 # command : (name, arguments)
 # thanks to Kaphotics: http://pastebin.com/raw/vrkp0SN8
@@ -72,6 +75,8 @@ moves = {
 
 doublyLink(moves)
 
+variables = {}
+
 class Move:
 	def setCode(self, code, args):
 		self.code = code
@@ -81,8 +86,18 @@ class Move:
 			self.name = moves[code]
 		else:
 			self.name = "%04x" % code
-	def setName(self, name):
-		pass
+	def setName(self, name, args):
+		self.name = name
+		self.args = args
+		
+		if name in moves:
+			self.code = moves[name]
+		else:
+			try:
+				self.code = int(self.name, 16)
+			except:
+				print("[ERROR] Unknown movement \"%s\"" % self.name)
+				exit(-3)
 	
 	def printText(self):
 		print("%s %04x" % (self.name, self.args))
@@ -90,7 +105,7 @@ class Move:
 class Movement:
 	def __init__(self, label, pos):
 		self.moves = []
-		self.label = label
+		self.label = label.rstrip(":")
 		self.pos = pos
 
 class Command:
@@ -99,7 +114,14 @@ class Command:
 		self.arg_count = 0
 	def setName(self, name):
 		self.name = name
-		self.code = commands[name]
+		if name in commands:
+			self.code = commands[name]
+		else:
+			try:
+				self.code = int(self.name, 16)
+			except:
+				print("[ERROR] Unknown command: \"%s\"" % self.name)
+				exit(-2)
 		
 	# load the name from a given code
 	# also updates the number of arguments for the given code
@@ -131,6 +153,11 @@ class Command:
 					ret += " %04x" % arg
 		return ret
 			
+# convert bytes to a string, and also swap both bytes
+def s(a):
+	if type(a) is str:
+		a = int(a, 16)
+	return "%04x" % ((a >> 8) | ((a & 0x00FF) << 8))
 
 class PokeScript:
 	def __init__(self):
@@ -145,7 +172,91 @@ class PokeScript:
 			print("%s: " % movement.label)
 			for move in movement.moves:
 				move.printText()
-	
+				
+	def printBytes(self):
+		# find out the length of the commands portion
+		size = 0
+		for command in self.commands:
+			size += 2 + len(command.args)*2
+			
+		for command in self.commands:
+			sys.stdout.write(s(command.code))
+			arg_copy = command.args[:]
+			
+			# handle special logic to resolve movement labels
+			if command.name == "ApplyMovement":
+				for movement in self.movements:
+					if arg_copy[1] == movement.label:
+						arg_copy[1] = movement.pos - command.pos - 8
+				if arg_copy[0] in variables:
+					arg_copy[0] = variables[arg_copy[0]]
+			if command.name == "Message":
+				if arg_copy[2] in variables:
+					arg_copy[2] = variables[arg_copy[2]]
+					
+			
+			for arg in arg_copy:
+				sys.stdout.write(s(arg))
+		for movement in self.movements:
+			for move in movement.moves:
+				sys.stdout.write(s(move.code))
+				sys.stdout.write(s(move.args))
+								
+	def loadText(self, text):
+		pos_count = 0
+		seen_delimiter = False
+		parsing_cmds = True
+		for line in text:
+			# skip comments
+			if line.startswith("#"):
+				continue
+				
+			# remove whitespace
+			line = line.strip()
+				
+			vals = line.split()
+			
+			# skip empty lines
+			if len(vals) == 0:
+				continue
+			
+			if parsing_cmds:
+				if vals[0] == "ScriptDelimiter":
+					# switch to parsing movements on
+					# the second script delimiter seen
+					if seen_delimiter:
+						parsing_cmds = False
+					else:
+						seen_delimiter = True
+						
+				# only start counting commands after seeing the delimiter
+				if seen_delimiter:
+					cmd = Command()
+					cmd.setName(vals[0])
+					cmd.args = vals[1:]
+					cmd.pos = pos_count
+
+					pos_count += 2 + 2*len(cmd.args)
+					self.commands.append(cmd)
+				else:
+					# before first ScriptDelimiter
+					if vals[1] == "=":
+						# variable declaration
+						variables[vals[0]] = vals[2]
+		
+			else:
+				# label, make a new movement object
+				if vals[0].endswith(":"):
+					movement = Movement(vals[0], pos_count)
+					self.movements.append(movement)
+				else:
+					# move, add to last movement object
+					move = Move()
+					move.setName(vals[0], int(vals[1], 16))
+					self.movements[-1].moves.append(move)
+					pos_count += 4
+		
+				
 	def loadBytes(self, text):
 		data = text.read()
 		
