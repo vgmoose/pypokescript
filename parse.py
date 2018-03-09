@@ -84,8 +84,18 @@ class Move:
 			self.name = moves[code]
 		else:
 			self.name = "%04x" % code
-	def setName(self, name):
-		pass
+	def setName(self, name, args):
+		self.name = name
+		self.args = args
+		
+		if name in moves:
+			self.code = moves[name]
+		else:
+			try:
+				self.code = int(self.name, 16)
+			except:
+				print("[ERROR] Unknown movement \"%s\"" % self.name)
+				exit(-3)
 	
 	def printText(self):
 		print("%s %04x" % (self.name, self.args))
@@ -93,7 +103,7 @@ class Move:
 class Movement:
 	def __init__(self, label, pos):
 		self.moves = []
-		self.label = label
+		self.label = label.rstrip(":")
 		self.pos = pos
 
 class Command:
@@ -105,7 +115,11 @@ class Command:
 		if name in commands:
 			self.code = commands[name]
 		else:
-			self.code = int(self.name, 16)
+			try:
+				self.code = int(self.name, 16)
+			except:
+				print("[ERROR] Unknown command: \"%s\"" % self.name)
+				exit(-2)
 		
 	# load the name from a given code
 	# also updates the number of arguments for the given code
@@ -139,6 +153,8 @@ class Command:
 			
 # convert bytes to a string, and also swap both bytes
 def s(a):
+	if type(a) is str:
+		a = int(a, 16)
 	return "%04x" % ((a >> 8) | ((a & 0x00FF) << 8))
 
 class PokeScript:
@@ -180,15 +196,42 @@ class PokeScript:
 				sys.stdout.write(s(move.args))
 								
 	def loadText(self, text):
+		pos_count = 0
+		seen_delimiter = False
+		parsing_cmds = True
 		for line in text:
 			vals = line.split()
-			# either look up the opcode, or write the string as hex
-			cmd = Command()
-			cmd.setName(vals[0])
-			cmd.args = vals[1:]
 			
-		# todo: sort categories
-	
+			if parsing_cmds:
+				cmd = Command()
+				cmd.setName(vals[0])
+				cmd.args = vals[1:]
+				cmd.pos = pos_count
+
+				pos_count += 2 + 2*len(cmd.args)
+				self.commands.append(cmd)
+
+				if cmd.name == "ScriptDelimiter":
+					# switch to parsing movements on
+					# the second script delimiter seen
+					if seen_delimiter:
+						parsing_cmds = False
+					else:
+						seen_delimiter = True
+		
+			else:
+				# label, make a new movement object
+				if vals[0].endswith(":"):
+					movement = Movement(vals[0], pos_count)
+					self.movements.append(movement)
+				else:
+					# move, add to last movement object
+					move = Move()
+					move.setName(vals[0], int(vals[1], 16))
+					self.movements[-1].moves.append(move)
+					pos_count += 4
+		
+				
 	def loadBytes(self, text):
 		data = text.read()
 		
@@ -273,7 +316,7 @@ if sys.argv[1].lower().endswith(".txt"):
 	# text given, load as text
 	with open(sys.argv[1], "r") as text:
 		script.loadText(text)
-#		script.printBytes()
+		script.printBytes()
 else:
 	# assume script given, load as data
 	with open(sys.argv[1], "rb") as data:
