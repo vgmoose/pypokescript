@@ -1,4 +1,5 @@
 language: python
+sudo: required
 matrix:
   include:
     - os: linux
@@ -11,6 +12,7 @@ addons:
       - "python3-pip"
  
 before_script:
+  - "sudo mkdir /usr/lib/python3.4/site-packages/"
   - "pip3 install setuptools"
  
-script: python3 setup.py install && ./run_tests.sh
+script: sudo python3 setup.py install && ./run_tests.sh
