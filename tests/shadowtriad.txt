@@ -1,0 +1,223 @@
+# actor variables
+Cilan = 0001
+Chili = 0000
+Cress = 0002
+ShadowCilan = 0003
+ShadowChili = 0004
+ShadowCress = 0005
+Player = 00ff
+
+# setup stuff
+ScriptDelimiter
+0000
+fd13
+LockAll
+StartCameraEvent
+LockCamera
+MoveCamera 25de 0000 cf27 000e 8000 0007 8000 0004 8000
+ReturnAfterDelay 0001
+EndCameraEvent
+
+# fix one shadow triad guy
+ApplyMovement ShadowCress MoveRightUp 0000
+
+# hide player character
+ApplyMovement Player InstantHide 0000
+
+# hide shadow triad instantly
+ApplyMovement ShadowCilan InstantHide 0000
+ApplyMovement ShadowChili InstantHide 0000
+ApplyMovement ShadowCress InstantHide 0000
+
+# move the shadow triad people over a few spaces
+ApplyMovement ShadowCilan GoLeft5Spaces 0000
+ApplyMovement ShadowChili GoLeft5Spaces 0000
+ApplyMovement ShadowCress GoLeft5Spaces 0000
+
+# make the shadow triad face the right directions,
+# for after they transform
+ApplyMovement ShadowCilan LookRight 0000
+ApplyMovement ShadowChili LookDown 0000
+ApplyMovement ShadowCress LookLeft 0000
+
+# fade in the screen
+WaitMovement
+FlashBlackInstant
+MoveCamera 25de 0000 d02b 000e 8000 0007 0000 0000 8000
+ReturnAfterDelay 003c
+EndCameraEvent
+Xtransciever7
+
+# conversation between Straiton people
+
+Message 0400 0000 Cilan 0000 0000
+CloseMessageKeyPress2
+Message 0400 0001 Chili 0000 0000
+CloseMessageKeyPress2
+Message 0400 0002 Cress 0000 0000
+CloseMessageKeyPress2
+Message 0400 0003 Cilan 0000 0000
+CloseMessageKeyPress2
+Message 0400 0004 Chili 0000 0000
+CloseMessageKeyPress2
+Message 0400 0005 Cress 0000 0000
+CloseMessageKeyPress2
+Message 0400 0006 Cilan 0000 0000
+CloseMessageKeyPress2
+Message 0400 0007 Chili 0000 0000
+CloseMessageKeyPress2
+Message 0400 0008 Cress 0000 0000
+CloseMessageKeyPress2
+
+# "What are yoou saying?..."
+Message 0400 0009 Cilan 0000 0000
+CloseMessageKeyPress2
+Message 0400 000a Chili 0000 0000
+CloseMessageKeyPress2
+Message 0400 000b Cress 0000 0000
+CloseMessageKeyPress2
+Message 0400 000c Cilan 0000 0000
+CloseMessageKeyPress2
+Message 0400 000d Chili 0000 0000
+CloseMessageKeyPress2
+Message 0400 000e Cress 0000 0000
+CloseMessageKeyPress2
+
+# Cilan: "All right..."
+Message 0400 000f Cilan 0000 0000
+CloseMessageKeyPress2
+
+# transform Cilan into a shadow triad guy
+ApplyMovement Cilan InstantHide 0000
+ApplyMovement ShadowCilan FlashIn 0000
+WaitMovement
+
+ReturnAfterDelay 000e
+
+# turn the other two into shadow triad peeps too
+ApplyMovement Chili InstantHide 0000
+ApplyMovement ShadowChili FlashIn 0000
+ApplyMovement Cress InstantHide 0000
+ApplyMovement ShadowCress FlashIn 0000
+WaitMovement
+
+# some dialogue from chili and cress
+Message 0400 0010 ShadowChili 0000 0000
+CloseMessageKeyPress2
+Message 0400 0011 ShadowCress 0000 0000
+CloseMessageKeyPress2
+
+# fade out Chili and Cilan
+ApplyMovement ShadowChili FlashOut 0000
+ApplyMovement ShadowCilan FlashOut 0000
+WaitMovement
+
+ReturnAfterDelay 001e
+
+# turn Cress to the right
+ApplyMovement ShadowCress TurnRight 0000
+WaitMovement
+
+ReturnAfterDelay 001e
+
+# fade him out too
+ApplyMovement ShadowCress FlashOut 0000
+
+# ending script stuff
+MoveCamera 25de 0000 cf27 000e 8000 0007 8000 0004 8000
+ReturnAfterDelay 001e
+FadeIntoBlack
+Xtransciever7
+EndCameraEvent
+0021
+000f
+ReleaseCamera
+StopCameraEvent
+TeleportWarp 0007 000b 0000 0003 0000
+WaitMoment
+UnlockAll
+ScriptDelimiter
+
+
+# movement data below
+
+MoveDown: 
+	WalkDown 0001
+	EndMovement 0000
+MoveUp: 
+	WalkUp 0001
+	EndMovement 0000
+MoveRight: 
+	WalkRight 0001
+	EndMovement 0000
+MoveLeft: 
+	WalkLeft 0001
+	EndMovement 0000
+LookUp: 
+	FaceUp 0001
+	EndMovement 0000
+LookDown: 
+	FaceDown 0001
+	EndMovement 0000
+LookLeft: 
+	FaceLeft 0001
+	EndMovement 0000
+LookRight: 
+	FaceRight 0001
+	EndMovement 0000
+TurnUp: 
+	NoMove3Up 0001
+	EndMovement 0000
+TurnLeft2: 
+	NoMove3Left 0001
+	EndMovement 0000
+TurnLeft: 
+	NoMove3Left 0001
+	EndMovement 0000
+TurnRight: 
+	NoMove3Right 0001
+	EndMovement 0000
+DisplayExclamationMark: 
+	Exclamation! 0001
+	EndMovement 0000
+DisplayQuestionmark: 
+	Question? 0001
+	EndMovement 0000
+StepBackLeft: 
+	0047 0001
+	00a9 0001
+	0048 0001
+	EndMovement 0000
+GoLeft5Spaces: 
+	WalkLeft 0005
+	EndMovement 0000
+MoveDownRight: 
+	WalkDown 0001
+	WalkRight 0001
+	EndMovement 0000
+Unused17: 
+	000a 0001
+	EndMovement 0000
+Unused18: 
+	WalkLeft 0001
+	NoMove3Up 0001
+	EndMovement 0000
+Unused19: 
+	WalkRight 0001
+	NoMove3Down 0001
+	EndMovement 0000
+FlashIn: 
+	Reappear 0001
+	ShadowTriadIn 0001
+	EndMovement 0000
+FlashOut: 
+	ShadowTriadOut 0001
+	Vanish 0001
+	EndMovement 0000
+MoveRightUp: 
+	WalkRight 0001
+	WalkUp 0001
+	EndMovement 0000
+InstantHide: 
+	Vanish 0000
+	EndMovement 0000

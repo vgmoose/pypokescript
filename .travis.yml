@@ -1,0 +1,7 @@
+language: python
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+  
+script: python setup.py install && ./run_tests.sh
