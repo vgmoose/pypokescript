@@ -1,2 +1,2 @@
 cd tests
-python shadowtriad.py
+python3 shadowtriad.py

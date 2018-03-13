@@ -3,5 +3,14 @@ matrix:
   include:
     - os: linux
       dist: trusty
-  
-script: python setup.py install && ./run_tests.sh
+
+addons:
+  apt:
+    packages:
+      - "python3"
+      - "python3-pip"
+ 
+before_script:
+  - "pip3 install setuptools"
+ 
+script: python3 setup.py install && ./run_tests.sh
