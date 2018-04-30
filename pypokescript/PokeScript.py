@@ -11,14 +11,13 @@ game = b2w2()
 commands = game.commands
 moves = game.moves
 
-variables = {}
-
 # this object represents a b2w2 pokescript file
 # it contains method sthat can turn a txt file into the binary to be injected
 # into the narc, and vice versa
 class PokeScript:
 	def __init__(self, path=None):
 		self.commands = []
+		self.variables = {}
 		self.movements = []
 		
 		if path:
@@ -34,9 +33,9 @@ class PokeScript:
 	def getText(self):
 		ret = []
 		
-		for variable in variables:
-			ret.append("# actor variables\n")
-			ret.append("%s = %s\n" % (variable, variables[variable]))
+		ret.append("# actor variables\n")
+		for variable in self.variables:
+			ret.append("%s = %s\n" % (variable, self.variables[variable]))
 		
 		ret.append("\n# script commands\n")
 		for command in self.commands:
@@ -68,11 +67,11 @@ class PokeScript:
 				for movement in self.movements:
 					if arg_copy[1] == movement.label:
 						arg_copy[1] = movement.pos - command.pos - 8
-				if arg_copy[0] in variables:
-					arg_copy[0] = variables[arg_copy[0]]
+				if arg_copy[0] in self.variables:
+					arg_copy[0] = self.variables[arg_copy[0]]
 			if command.name == "Message":
-				if arg_copy[2] in variables:
-					arg_copy[2] = variables[arg_copy[2]]
+				if arg_copy[2] in self.variables:
+					arg_copy[2] = self.variables[arg_copy[2]]
 					
 			
 			for arg in arg_copy:
@@ -122,10 +121,10 @@ class PokeScript:
 					pos_count += 2 + 2*len(cmd.args)
 					self.commands.append(cmd)
 				else:
-					# before first ScriptDelimiter
-					if vals[1] == "=":
+					# before first ScriptDelimiter, check for variables
+					if len(vals) > 1 and vals[1] == "=":
 						# variable declaration
-						variables[vals[0]] = vals[2]
+						self.variables[vals[0]] = vals[2]
 		
 			else:
 				# label, make a new movement object

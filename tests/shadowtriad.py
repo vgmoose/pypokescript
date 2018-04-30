@@ -42,3 +42,5 @@ script3 = ps.PokeScript("shadowtriad_gen.txt")
 m3 = hashlib.md5()
 m3.update(script3.getBytes())
 assert m3.hexdigest()==checksum, "Checksum didn't match, couldn't re-load from previously generated text file"
+
+print("All tests completed successfully")
