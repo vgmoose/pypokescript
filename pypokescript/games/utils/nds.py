@@ -111,22 +111,9 @@ def rs(pos, size):
 
 
 # write functions (little endian)
-def wi(pos, message, size=4, type="I"):
+def wi(target, pos, message, size=4, type="I"):
     write = struct.pack("<"+type, message)
-    out_data[pos:pos+size] = write
-
-def wi4(pos, message):
-    wi(pos, message, 4, "I")
-
-def wi2(pos, message):
-    wi(pos, message, 2, "H")
-
-def wb(pos, message):
-    out_data[pos] = chr(message)
-
-def ws(pos, message):
-    out_data[pos:pos+len(message)] = list(message)
-
+    target[pos:pos+size] = write
 
 fnt_pos, fnt_len = ri(0x40), ri(0x44)
 fat_pos, fat_len = ri(0x48), ri(0x4c)
@@ -218,84 +205,61 @@ if "-l" in sys.argv:
 if "-w" in sys.argv:
     print("Creating copy of ROM at \"%s\"" % OUTPUT_ROM)
 
-    # copy data into a new place in memory
-    # out_data = list(data[:fat_pos+fat_len])
-    # (up until banner info)
+    # the last thing that we care about from the original rom
     banner_pos = ri(0x68)
     banner_len = 0x840
-    out_data = list(data[:banner_pos+banner_len])
-
-    # # write a bunch of 0xFF after the fnt start
-    # out_data += ['\xff']*(rom_size - len(out_data))
-
-    # # create fnt table reservation space
-    # # contains the offset for the start of the entry and file IDs
-    # dir_count = len([x for x in path_data if path_data[x].is_dir]) - 1
-    # file_count = len([x for x in path_data if not path_data[x].is_dir])
-    # total_name_len = sum([len(path_data[x].name) for x in path_data])
-    #
-    # # the amount of space to reserve for the FNT table (goes at same fnt_pos)
-    # # all names + directory flags/id + directory offsets/start file_ids + file flags + "root" folder start (6)
-    # new_fnt_len = total_name_len + dir_count*2 + dir_count*8 + file_count + 6
-    #
-    # # write this size to the fnt_len position (fnt_pos isn't touched)
-    # wi(0x44, new_fnt_len)
-
-    # this project doesn't really care about the fnt table, so let's just use the old one
-    # TOOD: recopy it over based on file structure (commented out code above)
-    # moved to just use more data from the base rom above
-    # out_data[fnt_len:fnt_len+fnt_pos] = data[fnt_len:fnt_len+fnt_pos]
-
-    # # create fat table
-    # # contains start and end positions of every file
-    # # we need the fnt table to be fully created in order to do this,
-    # # otherwise we'd have to re-adjust all those start/end offsets
-    #
-    # # the very top file ID is where we start the offset counting from
-    # toppest_file_id = ri2(fnt_pos+4)        # 87 in pearl version
-    #
-    # # toppest id + number of files (results in a large gap between the "0th" ID and the toppest,
-    # # but that's just how it is?)
-    # total_fat_entries = toppest_file_id + file_count
-    # new_fat_len = total_fat_entries * 8
-    #
-    # # write the fat_pos (right after fnt_pos + new fnt_len, no gaps)
-    # new_fat_pos = fnt_pos + fnt_len
-    # wi(0x48, new_fat_pos)
-    #
-    # # new fat_len
-    # wi(0x4c, new_fat_len)
-
-    # we're going to try to reuse the fat table as well, since this application
-    # doesn't need to move it around, only adjust offsets
 
     # a count that keeps track of the position at the "end" of the file so far
-    # (starts at new_fat_pos + new_fat_len)
     eof = banner_pos+banner_len
 
-    # go through all files, grab their file ID, and write their bytes out
-    for path in path_data:
-        node = path_data[path]
-        node_len = len(node.data)
-
-        # position of start, end pointers
-        start, end = eof, eof + node_len
-        out_data += ['\xff'] * node_len
-
-        # position of start/end offsets in fat table
-        pos = fat_pos + node.id * 8
-        wi(pos, start)
-        wi(pos+4, end)
-
-        # write actual data to those offsets
-        out_data[start:end] = node.data
-
-        # update eof
-        eof += node_len
-
-    # write out files
+    # open up the the copy rom file (up until banner info)
+    # TODO: when things seem to work reliably, replace with rewriting to the original
     out = open(OUTPUT_ROM, "wb")
-    out.write("".join(out_data))
+    out.write(data[:eof])
+
+    # we're going to try to reuse the most of the data, and only adjust
+    # the data in the rom (same fnt and fat offsets and size)
+    # this means no renaming or adding/removing files is possible
+    # see git commit 16276bd408 for older implementation that re-used less
+
+    # a copy of what the fat table will be to write later
+    fat_table = list(data[fat_pos:fat_pos+fat_len])
+
+    # TODO: determine the original order these filesm were in, and make sure
+    # to write back in the same order
+
+    # go through all files, grab their file ID, and write their bytes out
+    process = [ root ]
+    while process:
+        node = process.pop(0)
+        if node.is_dir:
+            for child in node.contents:
+                if child.is_dir:
+                    # folder, process children later
+                    process.append(child)
+                    continue
+
+                node_len = len(child.data)
+
+                # position of start, end pointers
+                start, end = eof, eof + node_len
+
+                # position of start/end offsets relative to fat table
+                pos = child.id * 8
+                wi(fat_table, pos, start)
+                wi(fat_table, pos+4, end)
+
+                # write actual data to where those offsets will be
+                out.write(child.data)
+
+                # update eof
+                eof += node_len
+
+    # go back and rewrite our fat table start/end offsets over the original
+    out.seek(fat_pos)
+    out.write("".join(fat_table))
+
+    # finished writing
     out.close()
 
 if "-e" in sys.argv:
