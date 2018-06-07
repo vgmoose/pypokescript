@@ -1,8 +1,11 @@
+#!/bin/python3
+
 import struct, sys, os
 
 DUMP_DIR = "extracted"
 OUTPUT_ROM = "copy.nds"
 
+# just makes a directory without complaining
 def mkdir(target):
     try:
         os.makedirs(target)
@@ -90,9 +93,6 @@ except IOError:
 if not data:
     print("File is empty or bad permissions?")
 
-title = data[:12]
-code = data[12:16]
-
 # read functions (little endian)
 def ri(pos, size=4, type="I"):
     return int(struct.unpack("<"+type, data[pos:pos+size])[0])
@@ -104,11 +104,13 @@ def ri2(pos):
     return ri(pos, 2, "H")
 
 def rb(pos):
-    return ord(data[pos])
+    return data[pos]
 
 def rs(pos, size):
-    return data[pos:pos+size]
+    return data[pos:pos+size].decode()
 
+title = rs(0, 12)
+code = rs(12, 4)
 
 # write functions (little endian)
 def wi(target, pos, message, size=4, type="I"):
@@ -257,7 +259,7 @@ if "-w" in sys.argv:
 
     # go back and rewrite our fat table start/end offsets over the original
     out.seek(fat_pos)
-    out.write("".join(fat_table))
+    out.write(bytes(fat_table))
 
     # finished writing
     out.close()
