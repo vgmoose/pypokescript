@@ -9,7 +9,7 @@ def doublyLink(m):
 			m[vals[x][0]] = keys[x]
 		else:
 			m[vals[x]] = keys[x]
-			
+
 # convert bytes to a string, and also swap both bytes
 def s(a):
 	if type(a) is str:

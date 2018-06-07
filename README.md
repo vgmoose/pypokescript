@@ -15,13 +15,13 @@ python3 setup.py install
 
 You can invoke the CLI like this on an extracted B2W2 script binary (These can be extracted from the narchive at `a/0/5/6` in B2W2*
 ```
-python3 -m pypokescript 6_123 > pokescript.txt
+python3 -m pypokescript.PokeScript 6_123 > pokescript.txt
 ```
 *You can use Nitro explorer 1.2b to get the .narc file out of the .nds file, and then PPNFR to extract a specific script file
 
 If you already have a .txt pokescript respresentation (perhaps exported by this program) it can be converted back into the binary format with the following command:
 ```
-python3 -m pypokescript pokescript.txt > 6_123.bin
+python3 -m pypokescript.PokeScript pokescript.txt > 6_123.bin
 ```
 At which point 6_123.bin is ready to be re-injected into the .narc file, and then the .narc file into the .nds file.
 
@@ -45,8 +45,19 @@ script = ps.PokeScript("6_123")
 
 Once you have your script object, you can then call either `script.getText()` or `script.getBytes()` to get either the contents of the pokescript text file or the raw bytes that would need to be inserted into the game.
 
+## Parsing .nds files
+You can list files from a .nds file by invoking the script as follows:
+```
+python3 -m pypokescript.games.utils.nds file.nds -l
+```
+
+Extract a single file/folder from the file structure
+```
+python3 -m pypokescript.games.utils.nds file.nds -e /path/to/folder/or/file
+```
+
 ## Future
 - Add support for more B2W2 commands/movements
-- Open and edit .nds files directly (using [3DSKit](https://github.com/Tyulis/3DSkit))
+- Add support for reading/writing to .narc files
 - Add other games script commands/movements/support
 - GUI!
