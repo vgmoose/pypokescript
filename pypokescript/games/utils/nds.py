@@ -221,7 +221,7 @@ class NDS(object):
         # finished writing
         out.close()
 
-    def extract(extract_path):
+    def extract(self, extract_path):
         if extract_path != "/" and extract_path.endswith("/"):
             extract_path = extract_path.rstrip("/")
         # lookup entry from extraction path

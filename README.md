@@ -17,7 +17,7 @@ You can invoke the CLI like this on an extracted B2W2 script binary (These can b
 ```
 python3 -m pypokescript.PokeScript 6_123 > pokescript.txt
 ```
-\*You can use Nitro explorer 1.2b to get the .narc file out of the .nds file, and then PPNFR to extract a specific script file
+\*You can use the nds utility (see bottom of readme) to get the .narc file out of the .nds file, and then PPNFR to extract a specific script file
 
 If you already have a .txt pokescript respresentation (perhaps exported by this program) it can be converted back into the binary format with the following command:
 ```
