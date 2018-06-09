@@ -56,8 +56,16 @@ Extract a single file/folder from the file structure
 python3 -m pypokescript.games.utils.nds file.nds -e /path/to/folder/or/file
 ```
 
+## Running the GUI
+A GUI is in development, and requires [wxPython](https://wxpython.org/pages/downloads/index.html) as a dependency. To run the GUI, use the following command:
+```
+python3 -m pypokescript.gui.gui
+```
+
+Currently all the GUI does is list files within a user-selected NDS file. In the future, it should provide most functionality provided by the CLI.
+
 ## Future
 - Add support for more B2W2 commands/movements
 - Add support for reading/writing to .narc files
 - Add other games script commands/movements/support
-- GUI!
+- Make GUI prettier and more functional!

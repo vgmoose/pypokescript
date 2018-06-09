@@ -6,3 +6,5 @@ __pycache__
 tests/*.bin
 tests/*_gen.txt
 *.pyc
+*.nds
+*extracted*

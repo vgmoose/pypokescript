@@ -8,15 +8,23 @@ from pypokescript.games.utils.nds import NDS
 PORT = 8073
 BrowseEvent, BROWSE_EVENT = wx.lib.newevent.NewEvent()
 
+DEVELOPMENT = False
+
+if not DEVELOPMENT:
+    import pypokescript.gui     # import self to get path later
+    import os
 
 def composePage(target, notice=None):
+    p = ""
+    if not DEVELOPMENT:
+        p = os.path.dirname(pypokescript.gui.__file__) + os.sep
     # compose the desired page from different UI components
     resp = ""
-    resp += open("header.html", "r").read()
+    resp += open(p + "header.html", "r").read()
     if notice:
         resp += "<div class='notice'>%s</div>" % notice
-    resp += "<style>" + open("index.css", "r").read() + "</style>"
-    resp += open(target+".html", "r").read()
+    resp += "<style>" + open(p + "index.css", "r").read() + "</style>"
+    resp += open(p + target+".html", "r").read()
 
     return resp
 
