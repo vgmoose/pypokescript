@@ -57,7 +57,7 @@ python3 -m pypokescript.games.utils.nds file.nds -e /path/to/folder/or/file
 ```
 
 ## Running the GUI
-A GUI is in development, and requires [wxPython](https://wxpython.org/pages/downloads/index.html) as a dependency. To run the GUI, use the following command:
+A GUI is in development, and requires [wxPython](https://wxpython.org/pages/downloads/index.html) and [Flask](https://pypi.org/project/Flask/1.0.2/) as dependencies. To run the GUI, use the following command:
 ```
 python3 -m pypokescript.gui.gui
 ```

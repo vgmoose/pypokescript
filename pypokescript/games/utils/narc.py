@@ -20,4 +20,4 @@ class NARC:
             offset_pos = btaf_pos+12 + x*8
             start, end = data[offset_pos:offset_pos+8]
 
-        gmif_pos = btaf_pos + btaf_size +
+        # gmif_pos = btaf_pos + btaf_size +
