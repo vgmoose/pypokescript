@@ -5,7 +5,7 @@ setup(
 	version='0.0.1',
 	description='edit script files from pokemon games',
 	license='GPLv3',
-	packages=['pypokescript', 'pypokescript.games'],
+	packages=['pypokescript', 'pypokescript.games', 'pypokescript.games.utils'],
 	author='VGMoose',
 	author_email='me@vgmoose.com',
 	keywords=['pokescript', 'pokemon', 'rom editing'],

@@ -3,8 +3,6 @@
 
 import sys, os
 
-from .games.utils import nds
-
 try:
 	from .PokeScript import PokeScript
 except:

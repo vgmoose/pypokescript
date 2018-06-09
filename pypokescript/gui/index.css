@@ -1,0 +1,53 @@
+body
+{
+	font-family: arial, sans-serif;
+	margin: 0 auto;
+	padding: 0px;
+}
+
+header
+{
+	background-color: black;
+	color: white;
+	padding: 5px;
+}
+
+div
+{
+	padding: 15px;
+	/* border: 1px solid black; */
+}
+
+form
+{
+	display:inline;
+	/* float: left; */
+}
+
+header a
+{
+	text-decoration: none;
+	color: white;
+	font-weight: 500;
+}
+
+header a:hover
+{
+	text-decoration: underline;
+}
+
+.notice
+{
+	background-color: pink;
+	border: 1px solid red;
+	border-radius: 10px;
+	padding: 5px;
+	margin: 5px;
+}
+
+.code
+{
+	white-space: pre-wrap;
+	padding: 15px;
+	font-family: monospace;
+}

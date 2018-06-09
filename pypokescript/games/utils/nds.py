@@ -235,6 +235,22 @@ class NDS(object):
 
             print("Extracted file(s) to \"./%s\" folder" % DUMP_DIR)
 
+    def info(self):
+        # return basic info about the ds file
+        s = ""
+        s += "Loaded \"%s\" [%s]\n" % (self.title, self.code)
+        s += "ROM size: %d\n" % (self.rom_size)
+
+        s += "File Name Table (FNT) info:\n"
+        s += "  offset: %d\n" % self.fnt_pos
+        s += "  length: %d\n" % self.fnt_len
+
+        s += "File Allocation Table (FAT) info:\n"
+        s += "  offset: %d\n" % self.fat_pos
+        s += "  length: %d\n" % self.fat_len
+
+        return s
+
     # read functions (little endian)
     def ri(self, pos, size=4, type="I"):
         return int(struct.unpack("<"+type, self.data[pos:pos+size])[0])
@@ -278,16 +294,7 @@ def __main__():
     if not nds.data:
         print("File is empty or bad permissions?")
 
-    print("Loaded \"%s\" [%s]" % (nds.title, nds.code))
-    print("ROM size: %d" % (nds.rom_size))
-
-    print("File Name Table (FNT) info:")
-    print("  offset: %d" % nds.fnt_pos)
-    print("  length: %d" % nds.fnt_len)
-
-    print("File Allocation Table (FAT) info:")
-    print("  offset: %d" % nds.fat_pos)
-    print("  length: %d" % nds.fat_len)
+    print(nds.info())
 
     # do argument parsing operations
     if "-l" in sys.argv:
