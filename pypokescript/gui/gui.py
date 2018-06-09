@@ -4,6 +4,8 @@ from flask import Flask
 from threading import Thread, Lock
 
 from pypokescript.games.utils.nds import NDS
+from pypokescript.games.utils.narc import NARC
+
 
 PORT = 8073
 BrowseEvent, BROWSE_EVENT = wx.lib.newevent.NewEvent()
