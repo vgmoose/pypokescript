@@ -25,17 +25,33 @@ class NARC:
         entries = ri4(data, btaf_pos + 8)
 
         self.files = []
+        file_locs = []
 
         # create files for every entry seen
         for x in range(entries):
             offset_pos = btaf_pos+12 + x*8
             start = ri(data, offset_pos)
             end = ri(data, offset_pos+4)
+            file_locs.append( (start, end) )
 
         offset = btaf_pos + btaf_size
 
         # offset by bntf size (first word in bntf header after magic)
-        offset += ri(data, offset + 4) + 4
+        offset += ri(data, offset + 4)
 
+        # let's make sure we're where we think we are (gmif magic)
+        if data[offset:offset+4].decode() != "GMIF":
+            raise NameError("While parsing NARC, couldn't find GMIF header")
+
+        offset += 4
         # offset should now be pointing at the first byte in gmif header after magic
-        print(offset, "%x" % data[offset])
+
+        gmif_body = offset + 8
+
+        # the data files will be read from start, end pairings
+        for loc in file_locs:
+            self.files.append(data[gmif_body+loc[0]:gmif_body+loc[1]])
+            # print("%d\t%d" % (loc[0], loc[1]))
+
+        # print(file_locs)
+        # print(self.files[1194])

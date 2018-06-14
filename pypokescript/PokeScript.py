@@ -15,19 +15,22 @@ moves = game.moves
 # it contains method sthat can turn a txt file into the binary to be injected
 # into the narc, and vice versa
 class PokeScript:
-	def __init__(self, path=None):
+	def __init__(self, incoming=None, isPath=True):
 		self.commands = []
 		self.variables = {}
 		self.movements = []
 
-		if path:
-			if path.lower().endswith(".txt"):
+		if isPath and incoming:
+			if incoming.lower().endswith(".txt"):
 				# if path is provided, read text from it
-				with open(path, "r") as text:
+				with open(incoming, "r") as text:
 					self.loadText(text)
 			else:
-				with open(path, "rb") as data:
+				with open(incoming, "rb") as data:
 					self.loadBytes(data)
+		else:
+			# assume it's binary data incoming
+			self.loadBytes(incoming, False)
 
 	# return the pokescript .txt representation of this object
 	def getText(self):
@@ -141,8 +144,11 @@ class PokeScript:
 
 	# initialize and load this object from an extracted binary file
 	# (use raw bytes, not hex code)
-	def loadBytes(self, text):
-		data = text.read()
+	def loadBytes(self, text, isFilePointer=True):
+		if isFilePointer:
+			data = text.read()
+		else:
+			data = text
 
 		last_cmd = None
 		pos_so_far = len(data)
