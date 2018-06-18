@@ -43,7 +43,7 @@ class NARC:
         if data[offset:offset+4].decode() != "GMIF":
             raise NameError("While parsing NARC, couldn't find GMIF header")
 
-        offset += 4
+        # offset += 4
         # offset should now be pointing at the first byte in gmif header after magic
 
         gmif_body = offset + 8
@@ -51,7 +51,5 @@ class NARC:
         # the data files will be read from start, end pairings
         for loc in file_locs:
             self.files.append(data[gmif_body+loc[0]:gmif_body+loc[1]])
-            # print("%d\t%d" % (loc[0], loc[1]))
 
-        # print(file_locs)
-        # print(self.files[1194])
+        # all files loaded into memory
