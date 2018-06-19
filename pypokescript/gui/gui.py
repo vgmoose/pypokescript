@@ -6,6 +6,15 @@ from threading import Thread, Lock
 from pypokescript.games.utils.nds import NDS
 from pypokescript.games.utils.narc import NARC
 
+# only supported target right now
+from pypokescript.games.b2w2 import b2w2
+
+import pypokescript as ps
+
+class Container:
+    pass
+
+g = Container()
 
 PORT = 8073
 BrowseEvent, BROWSE_EVENT = wx.lib.newevent.NewEvent()
@@ -16,12 +25,17 @@ if not DEVELOPMENT:
     import pypokescript.gui     # import self to get path later
     import os
 
-def composePage(target, notice=None):
+def composePage(target, notice=None, data={}):
     p = ""
     if not DEVELOPMENT:
         p = os.path.dirname(pypokescript.gui.__file__) + os.sep
     # compose the desired page from different UI components
     resp = ""
+
+    # if there's data, create a js object and insert it into the page
+    if data:
+        resp += "<script> data = %s; </script>" % str(data);
+
     resp += open(p + "header.html", "r").read()
     if notice:
         resp += "<div class='notice'>%s</div>" % notice
@@ -64,6 +78,12 @@ def start_flask(dialog):
     def main():
         return composePage("main")
 
+    @flask_app.route("/scripts/<number>")
+    def get_script(number):
+        # get the script for the current number, from the currently
+        # loaded script NARC file (TODO: break apart for other targets)
+        return ps.PokeScript(g.narc.files[int(number)], isPath=False).getText()
+
     @flask_app.route("/open", methods=["POST"])
     def open():
         # show dialog by signaling the main app loop
@@ -75,15 +95,12 @@ def start_flask(dialog):
         dialog.lock.release()
 
         if (dialog.selectedFile):
-            resp = composePage("editor")
-
             # open NDS file
-            nds = NDS(dialog.selectedFile)
+            g.nds = NDS(dialog.selectedFile)
+            g.narc = NARC(g.nds, b2w2.SCRIPT_PATH)
 
-            resp += "<div class='code'>"
-            resp += nds.info()
-            resp += nds.root.tree()
-            resp += "</div>"
+            data = {"count": len(g.narc.files)}
+            resp = composePage("editor", None, data)
 
             return resp
         else:

@@ -1,7 +1,10 @@
 from .. import Game
 
 class b2w2(Game.Game):
-	def __init__(self):		
+
+	SCRIPT_PATH = "/a/0/5/6"
+
+	def __init__(self):
 		# command : (name, arguments)
 		# thanks to Kaphotics: http://pastebin.com/raw/vrkp0SN8
 		self.commands = {

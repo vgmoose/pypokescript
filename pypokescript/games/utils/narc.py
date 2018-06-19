@@ -43,9 +43,7 @@ class NARC:
         if data[offset:offset+4].decode() != "GMIF":
             raise NameError("While parsing NARC, couldn't find GMIF header")
 
-        # offset += 4
-        # offset should now be pointing at the first byte in gmif header after magic
-
+        # gmif_body will now be pointing at the first byte in gmif header + 4, (after magic)
         gmif_body = offset + 8
 
         # the data files will be read from start, end pairings

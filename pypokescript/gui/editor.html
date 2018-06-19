@@ -1,0 +1,44 @@
+<header>
+  Select Script # <select id="script_selector"></select>
+</header>
+<textarea id="editor_main" class="code">
+Select a script number to load and edit from the drop down above.
+</textarea>
+
+<script>
+function loadScript()
+{
+  let selected = document.getElementById('script_selector').value;
+
+  GET("/scripts/" + selected, (text) => document.getElementById('editor_main').value = text);
+
+}
+
+// make a GET request to url
+function GET(url, callback)
+{
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.send(null);
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4)
+    {
+      if (xhr.status === 200)
+        callback(xhr.responseText);
+      else
+        alert("Some issue occurred while trying to load the remote file: (" + xhr.status +")");
+    }
+  }
+}
+
+let select = document.getElementById("script_selector");
+for (let x=0; x<data.count; x++)
+{
+  let opt = document.createElement('option');
+  opt.value = x;
+  opt.innerHTML = x;
+  select.appendChild(opt);
+}
+select.onchange = loadScript;
+</script>

@@ -1,19 +1,14 @@
 from pypokescript.games.utils.nds import NDS
 from pypokescript.games.utils.narc import NARC
 
+from pypokescript.games.b2w2 import b2w2
+
 import pypokescript as ps
 
-
+# open nds file
 nds = NDS("../POKEMON BLACK 2.nds")
-narc = NARC(nds, "/a/0/5/6")
 
-# script = ps.PokeScript(narc.files[1194], False)
-#
-# print(script.getText())
+# script NARC path
+narc = NARC(nds, b2w2.SCRIPT_PATH)
 
-
-a = open("ex.bin", "wb")
-a.write(narc.files[1194])
-a.close()
-
-print(ps.PokeScript("./ex.bin").getText())
+print(ps.PokeScript(narc.files[1194], isPath=False).getText())

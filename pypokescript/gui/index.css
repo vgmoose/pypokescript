@@ -50,4 +50,6 @@ header a:hover
 	white-space: pre-wrap;
 	padding: 15px;
 	font-family: monospace;
+	width: 100%;
+	height: 100%;
 }
