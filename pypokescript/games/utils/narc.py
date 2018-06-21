@@ -90,7 +90,14 @@ class NARC:
 
             offset += 8
 
-        # we can leave the btnf section alone
+        # we can leave the btnf section alone, skip to gmif
+        offset = self.gmif_body
+
+        # delete everything before the raw data gets written
+        del data[self.gmif_body:]
 
         # just go through and write the data out for every file contiguously
-        
+        for cur_file in files:
+            data.append(cur_file)
+
+        # data should now contain the new files
