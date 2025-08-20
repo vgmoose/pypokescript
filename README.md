@@ -64,6 +64,13 @@ python3 -m pypokescript.gui.gui
 
 Currently all the GUI does is list files within a user-selected NDS file. In the future, it should provide most functionality provided by the CLI.
 
+## Decode Pokewalker sprites
+A convenience script is provided based on [the research here](https://dmitry.gr/?r=05.Projects&proj=28.%20pokewalker#_TOC_12cbaa3353b95bb71369cec4a58ae87e) that can take a HG/SS .nds file, extract the NARC where the pokewalker sprites are stored, and export them as grayscale PNG images:
+
+```
+python3 decode_pokewalker.py hgss.nds
+```
+
 ## Future
 - Add support for more B2W2 commands/movements
 - Add support for reading/writing to .narc files
