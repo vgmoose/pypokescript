@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# From: https://github.com/magical/nlzss
+# MIT License Copyright © magical
 
 import sys
 from sys import stdin, stdout, stderr, exit
